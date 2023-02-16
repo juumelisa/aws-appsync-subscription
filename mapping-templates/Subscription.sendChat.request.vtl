@@ -1,0 +1,9 @@
+#set($user = $context.identity.username)
+#if($context.args.receiver != $user)
+ $util.unauthorized()
+#end
+{
+  "version": "2017-02-28",
+  "operation" : "Scan",
+  "limit": 1,
+}

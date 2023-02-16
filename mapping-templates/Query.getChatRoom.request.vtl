@@ -1,0 +1,17 @@
+{
+  "version" : "2017-02-28",
+  "operation" : "Query",
+  "query" : {
+    "expression": "pk = :pk",
+    "expressionValues" : {
+      ":pk" : $util.dynamodb.toDynamoDBJson($context.identity.username)
+    }
+  },
+  "scanIndexForward": false
+  #if( ${context.arguments.count} )
+      ,"limit": $util.toJson($context.arguments.count)
+  #end
+  #if( ${context.arguments.nextToken} )
+      ,"nextToken": "${context.arguments.nextToken}"
+  #end
+}
