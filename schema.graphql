@@ -1,0 +1,36 @@
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type Query {
+  getChatRoom(id: ID!, otherUser: String): Chat
+}
+
+type Mutation {
+  sendChat(input: MessageInput!): ChatMessage
+}
+
+type Subscription {
+  incomingChat(id: String!): ChatMessage
+}
+
+input MessageInput {
+  receiver: String!
+  message: String!
+}
+
+type ChatMessage {
+  pk: ID!
+  sk: String!
+  sender: String!
+  receiver: String!
+  message: String!
+  sendAt: AWSDateTime!
+  expDate: Int,
+}
+
+type Chat {
+  chats: [ChatMessage]
+}

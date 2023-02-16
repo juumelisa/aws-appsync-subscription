@@ -13,7 +13,7 @@ custom:
   tableName: chatRoom
   appSync:
     - name: 'appsyncChatApp'
-      schema: schema.api.graphql
+      schema: schema.graphql
       authenticationType: AWS_LAMBDA
       lambdaAuthorizerConfig:
         functionName: lambdaAuthorizer
@@ -32,11 +32,6 @@ custom:
           field: getChatRoom
           request: "Query.getChatRoom.request.vtl"
           response: "Query.getChatRoom.response.vtl"
-        - dataSource: ChatRoom
-          type: Query
-          field: getDMList
-          request: "Query.getDMList.request.vtl"
-          response: "Query.getDMList.response.vtl"
         - dataSource: ChatRoom
           type: Subscription
           field: incomingChat
