@@ -1,15 +1,73 @@
 service: aws-appsync-subscription
 frameworkVersion: '3'
 
+plugins:
+  - serverless-appsync-plugin
+  
 provider:
   name: aws
   runtime: nodejs14.x
   region: ap-southeast-1
 
+custom:
+  tableName: chatRoom
+  appSync:
+    - name: 'appsyncChatApp'
+      schema: schema.api.graphql
+      authenticationType: AWS_LAMBDA
+      lambdaAuthorizerConfig:
+        functionName: lambdaAuthorizer
+      # additionalAuthenticationProviders:
+      #   - authenticationType: AWS_IAM
+      #   - authenticationType: API_KEY
+      mappingTemplatesLocation: mapping-templates
+      mappingTemplates:
+        - dataSource: sendChat
+          type: Mutation
+          field: sendChat
+          request: "Mutation.sendChat.request.vtl"
+          response: "Mutation.sendChat.response.vtl"
+        - dataSource: ChatRoom
+          type: Query
+          field: getChatRoom
+          request: "Query.getChatRoom.request.vtl"
+          response: "Query.getChatRoom.response.vtl"
+        - dataSource: ChatRoom
+          type: Query
+          field: getDMList
+          request: "Query.getDMList.request.vtl"
+          response: "Query.getDMList.response.vtl"
+        - dataSource: ChatRoom
+          type: Subscription
+          field: incomingChat
+          request: "Subscription.sendChat.request.vtl"
+          response: "Subscription.sendChat.response.vtl"
+      dataSources:
+        - type: AMAZON_DYNAMODB
+          name: ChatRoom
+          config:
+            tableName: ${self:custom.tableName}
+
+resources:
+  Resources:
+    userTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableName}
+        AttributeDefinitions:
+          - AttributeName: pk
+            AttributeType: S
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: pk
+            KeyType: HASH
+          - AttributeName: id
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+          
 functions:
-  api:
-    handler: index.handler
-    events:
-      - httpApi:
-          path: /
-          method: get
+  lambdaAuthorizer:
+    handler: lambdaAuthorizer.handler
