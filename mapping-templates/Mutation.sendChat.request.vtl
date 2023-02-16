@@ -1,0 +1,27 @@
+#set($sender = $ctx.identity.resolverContext.brandUsername)
+#set($sendAt = $util.time.nowISO8601())
+#set($sk = "$sender$combineSign$sendAt")
+{
+  "version" : "2017-02-28",
+  "operation": "BatchPutItem",
+  "tables": {
+    "chatRoom": [
+      {
+        "pk" : $util.dynamodb.toDynamoDBJson($sender),
+        "sk": $util.dynamodb.toDynamoDBJson($sk),
+        "message": $util.dynamodb.toDynamoDBJson($ctx.args.input.message),
+        "sender": $util.dynamodb.toDynamoDBJson($sender),
+        "receiver": $utils.dynamodb.toDynamoDBJson($ctx.args.input.receiver),
+        "sendAt" : $util.dynamodb.toDynamoDBJson($sendAt),
+      },
+      {
+        "pk" : $util.dynamodb.toDynamoDBJson($ctx.args.input.receiver),
+        "sk": $util.dynamodb.toDynamoDBJson($sk),
+        "message": $util.dynamodb.toDynamoDBJson($ctx.args.input.message),
+        "sender": $util.dynamodb.toDynamoDBJson($sender),
+        "receiver": $utils.dynamodb.toDynamoDBJson($ctx.args.input.receiver),
+        "sendAt" : $util.dynamodb.toDynamoDBJson($sendAt),
+      }
+    ]
+  }
+}
